@@ -24,13 +24,17 @@ func main() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
 
-		if strings.Contains(commitHash, "^") {
+		if cantGetPullRequestNum(commitHash) {
 			fmt.Println(line)
 		} else {
 			x := strings.Replace(line, commitHash, getPullRequestNum(getGitShowOneline(commitHash)), -1)
 			fmt.Println(x)
 		}
 	}
+}
+
+func cantGetPullRequestNum(commitHash string) bool {
+	return strings.Contains(commitHash, "^")
 }
 
 func getCommitHash(line string) string {
