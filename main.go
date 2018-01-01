@@ -10,6 +10,11 @@ import (
 
 func main() {
 	args := os.Args
+	if len(args) < 2 {
+		fmt.Println("no args given")
+		os.Exit(1)
+	}
+
 	out, err := exec.Command("git", "blame", "--first-parent", args[1]).Output()
 
 	if err != nil {
