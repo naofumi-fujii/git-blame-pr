@@ -24,7 +24,6 @@ func main() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
 
-		// `$ git show oneline` does not work if commit hash start with `^`
 		if strings.Contains(commitHash, "^") {
 			fmt.Println(line)
 		} else {
