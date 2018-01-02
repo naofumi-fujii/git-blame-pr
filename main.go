@@ -32,8 +32,14 @@ func main() {
 		if cantGetPullRequestNum(commitHash) {
 			fmt.Println(line)
 		} else {
-			x := strings.Replace(line, commitHash, getPullRequestNum(getGitShowOneline(commitHash)), -1)
-			fmt.Println(x)
+			isMergePullRequest, gitShowOneline := getGitShowOneline(commitHash)
+			if !isMergePullRequest {
+				fmt.Println(line)
+			} else {
+				x := strings.Replace(line, commitHash, getPullRequestNum(gitShowOneline), -1)
+				fmt.Println(x)
+			}
+
 		}
 	}
 }
@@ -51,7 +57,7 @@ func getPullRequestNum(commitMessage string) string {
 	return fmt.Sprintf("%8s", x)
 }
 
-func getGitShowOneline(commit string) string {
+func getGitShowOneline(commit string) (bool, string) {
 	out, err := exec.Command("git", "show", "--oneline", commit).Output()
 
 	if err != nil {
@@ -60,5 +66,6 @@ func getGitShowOneline(commit string) string {
 	}
 
 	x := string(out)
-	return x
+	isMergePullRequest := strings.Contains(x, "Merge pull request")
+	return isMergePullRequest, x
 }
