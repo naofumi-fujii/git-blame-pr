@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -36,7 +37,7 @@ func main() {
 			if !isMergePullRequest {
 				fmt.Println(line)
 			} else {
-				x := strings.Replace(line, commitHash, getPullRequestNum(gitShowOneline), -1)
+				x := strings.Replace(line, commitHash, getPullRequestNum(gitShowOneline, len(commitHash)), -1)
 				fmt.Println(x)
 			}
 
@@ -52,9 +53,10 @@ func getCommitHash(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-func getPullRequestNum(commitMessage string) string {
+func getPullRequestNum(commitMessage string, commitHashlen int) string {
 	x := strings.Split(commitMessage, " ")[4]
-	return fmt.Sprintf("%8s", x)
+
+	return fmt.Sprintf("%"+strconv.Itoa(commitHashlen)+"s", x)
 }
 
 func getGitShowOneline(commit string) (bool, string) {
