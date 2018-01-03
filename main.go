@@ -45,8 +45,7 @@ func getGitBlame(filename string) string {
 		os.Exit(1)
 	}
 
-	x := string(out)
-	return x
+	return string(out)
 }
 
 func isMergePullRequest(gitShowOneline string) bool {
