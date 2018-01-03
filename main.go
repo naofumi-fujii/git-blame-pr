@@ -16,14 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	out, err := exec.Command("git", "blame", "--first-parent", args[1]).Output()
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	x := string(out)
+	x := getGitBlame(args[1])
 
 	scanner := bufio.NewScanner(strings.NewReader(x))
 	for scanner.Scan() {
@@ -44,6 +37,18 @@ func main() {
 		}
 	}
 }
+func getGitBlame(filename string) string {
+	out, err := exec.Command("git", "blame", "--first-parent", filename).Output()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	x := string(out)
+	return x
+}
+
 func isMergePullRequest(gitShowOneline string) bool {
 	return strings.Contains(gitShowOneline, "Merge pull request")
 }
