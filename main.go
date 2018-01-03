@@ -62,8 +62,8 @@ func getPullRequestNum(commitMessage string, commitHashlen int) string {
 	return fmt.Sprintf("%"+strconv.Itoa(commitHashlen)+"s", x)
 }
 
-func getGitShowOneline(commit string) string {
-	out, err := exec.Command("git", "show", "--oneline", commit).Output()
+func getGitShowOneline(commitHash string) string {
+	out, err := exec.Command("git", "show", "--oneline", commitHash).Output()
 
 	if err != nil {
 		fmt.Println(err)
