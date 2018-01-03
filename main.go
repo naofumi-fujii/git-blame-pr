@@ -56,8 +56,8 @@ func getCommitHash(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-func getPullRequestNum(commitMessage string, commitHashlen int) string {
-	x := strings.Split(commitMessage, " ")[4]
+func getPullRequestNum(gitShowOneline string, commitHashlen int) string {
+	x := strings.Split(gitShowOneline, " ")[4]
 
 	return fmt.Sprintf("%"+strconv.Itoa(commitHashlen)+"s", x)
 }
