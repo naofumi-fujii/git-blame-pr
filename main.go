@@ -22,15 +22,10 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
-		err, pullRequest := getPullRequest(commitHash)
-		if err {
-			fmt.Println(line)
+		pullRequest := getPullRequest(commitHash)
 
-		} else {
-			x := strings.Replace(line, commitHash, pullRequest, -1)
-			fmt.Println(x)
-
-		}
+		replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
+		fmt.Println(replacedLine)
 
 	}
 }
@@ -50,12 +45,16 @@ func getCommitHash(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-func getPullRequest(commitHash string) (bool, string) {
+func getPullRequest(commitHash string) string {
 	gitShowOneline := getGitShowOneline(commitHash)
-	pullRequestNum := strings.Split(gitShowOneline, " ")[4]
-	err := !strings.Contains(gitShowOneline, "Merge pull request")
+	pullRequestNum := ""
+	if strings.Contains(gitShowOneline, "Merge pull request") {
+		pullRequestNum = strings.Split(gitShowOneline, " ")[4]
+	} else {
+		pullRequestNum = commitHash
+	}
 
-	return err, fmt.Sprintf("%"+strconv.Itoa(len(commitHash))+"s", pullRequestNum)
+	return fmt.Sprintf("%"+strconv.Itoa(len(commitHash))+"s", pullRequestNum)
 }
 
 func getGitShowOneline(commitHash string) string {
