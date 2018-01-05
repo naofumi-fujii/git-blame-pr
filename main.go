@@ -16,16 +16,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	cached := map[string]string{}
+
 	gitBlameResult := getGitBlame(args[1])
 
 	scanner := bufio.NewScanner(strings.NewReader(gitBlameResult))
 	for scanner.Scan() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
-		pullRequest := getPullRequest(commitHash)
 
-		replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
-		fmt.Println(replacedLine)
+		if pullRequest, ok := cached[commitHash]; ok {
+			replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
+			fmt.Println(replacedLine)
+		} else {
+			pullRequest := getPullRequest(commitHash)
+			replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
+			fmt.Println(replacedLine)
+			cached[commitHash] = pullRequest
+		}
 
 	}
 }
