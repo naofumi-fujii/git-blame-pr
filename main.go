@@ -16,27 +16,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	x := getGitBlame(args[1])
+	gitBlameResult := getGitBlame(args[1])
 
-	scanner := bufio.NewScanner(strings.NewReader(x))
+	scanner := bufio.NewScanner(strings.NewReader(gitBlameResult))
 	for scanner.Scan() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
-
-		if cantGetPullRequestNum(commitHash) {
+		err, pullRequest := getPullRequest(commitHash)
+		if err {
 			fmt.Println(line)
+
 		} else {
-			gitShowOneline := getGitShowOneline(commitHash)
-			if !isMergePullRequest(gitShowOneline) {
-				fmt.Println(line)
-			} else {
-				x := strings.Replace(line, commitHash, getPullRequestNum(gitShowOneline, len(commitHash)), -1)
-				fmt.Println(x)
-			}
+			x := strings.Replace(line, commitHash, pullRequest, -1)
+			fmt.Println(x)
 
 		}
+
 	}
 }
+
 func getGitBlame(filename string) string {
 	out, err := exec.Command("git", "blame", "--first-parent", filename).Output()
 
@@ -48,22 +46,16 @@ func getGitBlame(filename string) string {
 	return string(out)
 }
 
-func isMergePullRequest(gitShowOneline string) bool {
-	return strings.Contains(gitShowOneline, "Merge pull request")
-}
-
-func cantGetPullRequestNum(commitHash string) bool {
-	return strings.Contains(commitHash, "^")
-}
-
 func getCommitHash(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-func getPullRequestNum(gitShowOneline string, commitHashlen int) string {
-	x := strings.Split(gitShowOneline, " ")[4]
+func getPullRequest(commitHash string) (bool, string) {
+	gitShowOneline := getGitShowOneline(commitHash)
+	pullRequestNum := strings.Split(gitShowOneline, " ")[4]
+	err := !strings.Contains(gitShowOneline, "Merge pull request")
 
-	return fmt.Sprintf("%"+strconv.Itoa(commitHashlen)+"s", x)
+	return err, fmt.Sprintf("%"+strconv.Itoa(len(commitHash))+"s", pullRequestNum)
 }
 
 func getGitShowOneline(commitHash string) string {
