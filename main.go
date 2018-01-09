@@ -55,7 +55,7 @@ func getCommitHash(line string) string {
 }
 
 func getPullRequest(commitHash string) string {
-	re := regexp.MustCompile("See merge request !([0-9]+)|Merge pull request #([0-9]+)")
+	re := regexp.MustCompile(`See merge request !([0-9]+)|Merge pull request #([0-9]+)`)
 	res := re.FindString(getGitShow(commitHash))
 	sl := strings.Split(res, " ")
 	pullRequestNum := ""
