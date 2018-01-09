@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
+	"regexp"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cached := map[string]string{}
+	// cached := map[string]string{}
 
 	gitBlameResult := getGitBlame(args[1])
 
@@ -25,17 +25,18 @@ func main() {
 		line := scanner.Text()
 		commitHash := getCommitHash(line)
 
-		if pullRequest, ok := cached[commitHash]; ok {
-			replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
-			fmt.Println(replacedLine)
-		} else {
-			pullRequest := getPullRequest(commitHash)
-			replacedLine := strings.Replace(line, commitHash, pullRequest, -1)
-			fmt.Println(replacedLine)
-			cached[commitHash] = pullRequest
-		}
-
+		fmt.Println(getPullRequest(commitHash))
 	}
+}
+
+func getPullRequest(commitHash string) string {
+	re := regexp.MustCompile("See merge request !([0-9]+)|Merge pull request #([0-9]+)")
+	res := re.FindString(getGitShowOneline(commitHash))
+	sl := strings.Split(res, " ")
+	if len(sl) > 1 {
+		return (sl[len(sl)-1])
+	}
+	return commitHash
 }
 
 func getGitBlame(filename string) string {
@@ -53,20 +54,8 @@ func getCommitHash(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-func getPullRequest(commitHash string) string {
-	gitShowOneline := getGitShowOneline(commitHash)
-	pullRequestNum := ""
-	if strings.Contains(gitShowOneline, "Merge pull request") {
-		pullRequestNum = strings.Split(gitShowOneline, " ")[4]
-	} else {
-		pullRequestNum = commitHash
-	}
-
-	return fmt.Sprintf("%"+strconv.Itoa(len(commitHash))+"s", pullRequestNum)
-}
-
 func getGitShowOneline(commitHash string) string {
-	out, err := exec.Command("git", "show", "--oneline", commitHash).Output()
+	out, err := exec.Command("git", "show", commitHash).Output()
 
 	if err != nil {
 		fmt.Println(err)
