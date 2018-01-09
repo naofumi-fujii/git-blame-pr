@@ -56,7 +56,7 @@ func getCommitHash(line string) string {
 
 func getPullRequest(commitHash string) string {
 	re := regexp.MustCompile("See merge request !([0-9]+)|Merge pull request #([0-9]+)")
-	res := re.FindString(getGitShowOneline(commitHash))
+	res := re.FindString(getGitShow(commitHash))
 	sl := strings.Split(res, " ")
 	pullRequestNum := ""
 	if len(sl) > 1 {
@@ -67,7 +67,7 @@ func getPullRequest(commitHash string) string {
 	return fmt.Sprintf("%"+strconv.Itoa(len(commitHash))+"s", pullRequestNum)
 }
 
-func getGitShowOneline(commitHash string) string {
+func getGitShow(commitHash string) string {
 	out, err := exec.Command("git", "show", commitHash).Output()
 
 	if err != nil {
